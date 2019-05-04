@@ -188,10 +188,41 @@ varying vec3 curraydir;
 
 uniform float time;
 
-const float eps 			= 0.001;  
+const float eps 			= 0.01;  
 
-const vec3 	zp 				= vec3(-10.0, 10.0, 15.0);	
-const float zr 				= 1.0;
+const vec3 zp0 = vec3(-15.0, 15.0, 15.0);
+const vec3 zp1 = vec3(  0.0, 15.0, 15.0);
+const vec3 zp2 = vec3( 0.0,  -2.0,  20.0);
+
+const float zr0 = 1.0;
+const float zr1 = 1.0;
+const float zr2 = 1.0;
+
+const vec4 zc0 = vec4(1.0, 0.0, 0.0, 1.0);
+const vec4 zc1 = vec4(0.0, 1.0, 0.0, 1.0);
+const vec4 zc2 = vec4(0.0, 0.0, 1.0, 1.0);
+
+vec3 zp(int i)
+{
+	if(i==0) return zp0;
+	if(i==1) return zp1;
+	return zp2;
+}
+
+float zr(int i)
+{
+	if(i==0) return zr0;
+	if(i==1) return zr1;
+	return zr2;
+}
+
+vec4 zc(int i)
+{
+	if(i==0) return zc0;
+	if(i==1) return zc1;
+	return zc2;
+}
+
 
 float sphereDistort(vec3 p)
 {
@@ -206,9 +237,9 @@ float sphere0(vec3 p)
     return length(p - spherePos) - sphereradius;
 }
 
-float sphereZon(vec3 p)
+float sphereZon(vec3 p, int i)
 {
-    return length(p - zp) - zr;
+    return length(p - zp(i)) - zr(i);
 }
 
 vec4 col(vec3 p)
@@ -229,8 +260,9 @@ float getDist(vec3 p)
 	p.x = acos(cos(p.x / m)) * m;
 	p.y = asin(sin(p.y / m)) * m;*/
 
+	
 
-	return min(sphereZon(p), sphere0(p));
+	return min(min(sphereZon(p,0), sphere0(p)), min(sphereZon(p,1), sphereZon(p,2)));
 }
 
 vec3 getNormal(vec3 p, float r)
@@ -253,35 +285,43 @@ vec3 getNormalDistorted(vec3 p, float r)
 	return 	normalize(n + (o * 0.4));
 }
 
+const int maxIt = 200;
 
-vec4 getLight(vec3 p, vec3 n)
+vec4 getLightFromSun(vec3 p, vec3 n, int i)
 {
-
-
-	vec3 	zn		= normalize(zp - p);
+	vec3 	zn		= normalize(zp(i) - p);
 	float 	dotzn 	= dot(zn, n),
 			l 		= 1.0;
 
-	for(int safetyCount = 0; safetyCount < 240; safetyCount++)
+	float ZR = zr(i);
+	vec3  ZP = zp(i);
+	vec4  ZC = zc(i);
+
+	for(int safetyCount = 0; safetyCount < maxIt; safetyCount++)
     {
 		float d 	 = getDist(p);
 		
-		float zd	 = length(zp - p);
+		float zd	 = length(ZP - p);
         p 			+= zn * min(d, zd);
 		
-		if(zd <= zr)
-			return dotzn *  vec4(1.0);
+		if(zd <= ZR)
+			return dotzn *  ZC;
 
 		if(d <= eps)
-			return dotzn *  vec4(l);
+			return dotzn *  vec4(l) *  ZC;
 
 		if(d < 1.0)
 			l = min(l, d);
 		
 	}
 
-	return vec4(1.0);
+	return vec4(1.0) *  ZC;
+}
 
+
+vec4 getLight(vec3 p, vec3 n)
+{
+	return max(getLightFromSun(p, n, 0), max(getLightFromSun(p, n, 1), getLightFromSun(p, n, 2)));
 }
 
 vec4 getLucht(vec3 p)
@@ -306,15 +346,16 @@ vec4 march()
 
 	
 
-	for(int safetyCount = 0; safetyCount < 300; safetyCount++)
+	for(int safetyCount = 0; safetyCount < maxIt; safetyCount++)
     {
 		t += d;
 		if(t > maxMist) return getLucht(p);
 
 		if(d <= eps)
 		{
-			if(sphereZon(p) <= eps)
-				return vec4(1.0);
+			for(int i=0; i<3; i++)
+				if(sphereZon(p, i) <= eps)
+					return zc(i);
 
 			vec3 n = getNormalDistorted(p, 0.125);
 			//return vec4(n, 1.0);

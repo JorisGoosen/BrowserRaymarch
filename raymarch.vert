@@ -19,6 +19,8 @@ uniform float zoom;
 varying vec3 startpoint;
 varying vec3 curraydir;
 
+
+
 mat4 rotationMatrix(vec3 axis, float angle)
 {
     axis = normalize(axis);
@@ -37,7 +39,7 @@ void main(void)
 	mat3 rotas = mat3(rotationMatrix(normalize(vec3(1.0, 0.0, 0.0)), (time * 0.0001236) * -1.0)); 
 	mat3 rot = mat3(rotationMatrix(vec3(0.0, 1.0, 0.0) * rotas, (time * 0.000166) * -1.05));
 
-    startpoint=	-rot * vec3( 10.0, -3.0, -20.0 * zoom);
+    startpoint=	-rot * vec3( 0.0, 0.0, -20.0 * zoom);
 	curraydir = rot * normalize(vec3(uv.x * fov_y_scale * aspect, uv.y * fov_y_scale, -1.0));
 
 	gl_Position = vec4(position, 1.);

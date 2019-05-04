@@ -13,6 +13,12 @@ var canvas=null;
 	document.addEventListener("MSFullscreenChange", fsswitch);
 
 	window.onload = init;
+
+	var zoom = 1.0;
+
+	function wheelFunction(event) {
+		zoom += event.deltaY * 0.005;
+	  } 	
 	
 	function init() {
 	
@@ -20,6 +26,8 @@ var canvas=null;
 		console.log(canvas);
 		gl= WebGLUtils.setupWebGL(canvas,{ antialias: false, depth: false, alpha: true });
 		console.log(gl);
+
+		canvas.addEventListener("wheel", wheelFunction);
 		
 		if(!gl) {alert("WebGL does not work!");}
 		
@@ -115,19 +123,12 @@ var canvas=null;
 		    document.msFullscreenElement
 		)  fullscreenEnabled=true;
 
-		
-		if(!fullscreenEnabled)
-		{
-			canvas.width  = 512;
-  			canvas.height = 512;
-  			document.getElementById("kleurtjes").removeAttribute('style');
+		canvas.width  = window.innerWidth;
+		canvas.height = window.innerHeight;
 
-		}else{
-			canvas.width  = window.innerWidth;
-  			canvas.height = window.innerHeight;
-  			document.getElementById("kleurtjes").style.top=0;
-  			document.getElementById("kleurtjes").style.left=0;
-		}
+		document.getElementById("kleurtjes").style.top=0;
+		document.getElementById("kleurtjes").style.left=0;
+	
 		
 		gl.viewport(0,0,canvas.width,canvas.height);
 		gl.clearColor(0.0,0.0,0.0,1.0);
@@ -136,6 +137,7 @@ var canvas=null;
 		gl.useProgram(VOLSHADER);
 		
 		gl.uniform1f(gl.getUniformLocation(VOLSHADER,"time"),			time);
+		gl.uniform1f(gl.getUniformLocation(VOLSHADER,"zoom"),			zoom);
 		gl.uniform1f(gl.getUniformLocation(VOLSHADER,"fov_y_scale"),	1.5);
 		gl.uniform1f(gl.getUniformLocation(VOLSHADER,"aspect"),			canvas.width/canvas.height);		
 				

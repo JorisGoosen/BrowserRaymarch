@@ -1,0 +1,323 @@
+@font-face
+{
+	font-family: Courier;
+}
+
+body {
+	background-color: #000000;
+	background-image: url('achter.jpg');
+	background-position: top left;
+	text-decoration: none;
+	font-size: 20px;
+	color: yellow;
+	
+}
+
+h1 {
+    font-size: 25px;
+    color: orange;
+    text-align: left;
+}
+
+p {
+	padding: 10px;
+	display: block;
+	color: yellow;
+	text-align: left;
+	
+}
+
+canvas {
+	background-color: #191919;
+	background: #191919;
+}
+
+input {
+	display: block;
+	width: 5%;
+}
+
+#doolhof {
+/*	background-color: #191919;
+	background: #191919; */
+	background: black;
+	background-color: black;
+	left: 768px;
+	top: 256px;
+	width: 512px;
+	height: 512px;	
+	display: block;
+	position: absolute;
+}
+
+#bovenbalk {
+/*	background-color: #191919;
+	background: #191919; */
+	background: #999900;
+	background-color: #999900;
+	color: black;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 20px;	
+	display: block;
+	position: absolute;
+	font-size: 16px;
+	text-align: center;
+}
+
+#plantjescontrols
+{
+	font-size: 10px;
+	left: 0;
+	top: 20px;
+	width: 100%;
+	height: 100%%;	
+	margin: 0%;
+	display: block;
+	position: absolute;
+}
+
+#ResetKnop
+{
+	display: block;
+}
+
+#kanvas {
+	left: 0;
+	top: 20px;
+	width: 92%;
+	height: 92%%;	
+	margin-left: 6%;
+	margin-right: 3%;
+	margin-top: 2%;
+	display: block;
+	position: absolute;
+}
+
+
+#introductie{
+	/* background-image: url('doorzichtig.png');*/
+	position: absolute;
+	background-color: #191919;
+	left: 256px;
+	top: 256px;
+	width: 512px;
+	height: 512px;
+	display: block;
+}
+
+#kleurtjes{
+	/* background-image: url('doorzichtig.png');*/
+	position: absolute;
+	background-color: #191919;
+	left: 256px;
+	top: 256px;
+	width: auto;
+	height: auto;
+	display: block;
+}
+
+
+#volcolinfo
+{
+	
+	position: absolute;
+	background-image: url('achterbesturingvolcol.jpg');
+	
+	top: 768px;
+	left: 512px;
+	width: 256px;
+	height: 256px;
+}
+
+#volcolcontrol{
+	
+	position: absolute;
+	background-image: url('achterbesturingvolcol.jpg');
+	
+	top: 256px;
+	left: 768px;
+	width: 256px;
+	height: 256px;
+}
+
+.box{
+	background-image: url('doorzichtig.png');
+	width: 160px;
+	height:140px;
+	margin-left: 28px;
+	margin-right: 28px;
+	margin-top: 38px;
+	margin-bottom: 38px;
+	padding: 20px;
+	display:block;
+	text-align: center;
+	text-decoration:none;
+	color: yellow;
+	font-size: 25px;
+
+}
+
+#thesis{
+	/* background-image: url('doorzichtig.png');*/
+	position: absolute;
+	background-color: #191919;
+	left: 256px;
+	top: 0px;
+	padding-top: 32px;
+	width: 768px;
+	height: 736px;
+	display: block;
+}
+
+#slideshow-container-container{
+	position: absolute;
+	background-color: #191919;
+	left: 256px;
+	top: 256px;
+	width: 768px;
+	height: 512px;	
+	display: block;
+}		
+
+#slideshow-container{
+	width: 768px;
+	height: 432px; 
+	background-color: black;
+}
+
+
+
+#menu
+{
+	
+
+	position: absolute;
+	background-image: url('achtermenu.jpg');
+	top: 512px;
+	left: 0px;
+	width: 256px;
+	height: 256px;
+
+	
+}
+
+#menu2
+{
+	
+
+	position: absolute;
+	background-image: url('achtermenu.jpg');
+	top: 256px;
+	left: 0px;
+	width: 256px;
+	height: 256px;
+
+	
+}
+
+.menuitem {
+	display: block;
+	font-size: 15px;
+	padding: 5px;
+	margin:5px;
+	color: white;
+	text-align: left;
+	text-decoration: none;
+	background-image: url('doorzichtig.png');
+	
+}
+
+.abstract {
+	text-align: center;
+	color: #BBBB00;
+	font-size:18px;
+	margin-left: 64px;
+	margin-right: 64px;
+}
+
+.emaillink{
+	color: yellow;
+
+}
+
+
+ul {
+    list-style-type: none;
+    display: inline;
+   
+} 
+
+
+
+
+@keyframes fadey { 
+
+0% { opacity: 0; }
+
+15% { opacity: 1; }
+
+85% { opacity: 1; }
+
+100% { opacity: 0; }
+
+}
+
+@-webkit-keyframes fadey { 
+
+0% { opacity: 0; }
+
+15% { opacity: 1; }
+
+85% { opacity: 1; }
+
+100% { opacity: 0; }
+
+}
+
+@-moz-keyframes fadey { 
+
+0% { opacity: 0; }
+
+15% { opacity: 1; }
+
+85% { opacity: 1; }
+
+100% { opacity: 0; }
+
+}
+
+ 
+
+figure#slideshow {
+	width: 100%; 
+	margin: 0; 
+	padding: 0;
+	position: relative;
+	
+}
+
+figure#slideshow img {
+
+ position: absolute; left: 0; top: 0; width: 100%; height:auto;
+
+ 
+ opacity: 0;
+
+}
+
+figure#slideshow img:first-child { position: relative; }
+
+
+
+#container:fullscreen { display: flex; justify-content: center; align-items: center;}
+
+#container:fullscreen figure { width: 80%; margin: 0; padding: 0; }
+
+:-webkit-fullscreen { width: 100%; height: 100%;  background: black;}
+
+*:-moz-fullscreen { background: black; }
+
+
+

@@ -128,7 +128,7 @@ var setupWebGL = function(canvas, opt_attribs) {
  * @return {!WebGLContext} The created context.
  */
 var create3DContext = function(canvas, opt_attribs) {
-  var names = [ "experimental-webgl","webkit-3d","webgl", "moz-webgl"];
+  var names = [ "webgl2", "experimental-webgl","webkit-3d","webgl",  "moz-webgl"];
   var context = null;
   for (var ii = 0; ii < names.length; ++ii) {
   	console.log("trying out: "+names[ii]);

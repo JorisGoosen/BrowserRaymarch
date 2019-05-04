@@ -1,0 +1,44 @@
+const glsl = x => x;
+
+const raymarchvert = glsl`
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+
+
+attribute vec3 position;
+attribute vec2 uv;
+
+uniform float fov_y_scale;
+uniform float aspect;
+uniform float time;
+
+varying vec3 startpoint;
+varying vec3 curraydir;
+
+mat4 rotationMatrix(vec3 axis, float angle)
+{
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+    
+    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+                0.0,                                0.0,                                0.0,                                1.0);
+}
+
+void main(void)
+{ 
+	mat3 rotas = mat3(rotationMatrix(normalize(vec3(0.0, 1.0, 0.12)), time * 0.00036)); 
+	mat3 rot = mat3(rotationMatrix(vec3(0.0, 1.0, 0.0) * rotas, time * 0.00066));
+
+    startpoint=	-rot * vec3(0, 0, -10.0);
+	curraydir = rot * normalize(vec3(uv.x * fov_y_scale * aspect, uv.y * fov_y_scale, -1.0));
+
+	gl_Position = vec4(position, 1.);
+}
+`

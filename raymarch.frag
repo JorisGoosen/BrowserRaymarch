@@ -306,7 +306,7 @@ vec4 march()
 
 	
 
-	for(int safetyCount = 0; safetyCount < 600; safetyCount++)
+	for(int safetyCount = 0; safetyCount < 300; safetyCount++)
     {
 		t += d;
 		if(t > maxMist) return getLucht(p);
@@ -324,7 +324,7 @@ vec4 march()
 			if(t > minMist)
 				mist = (t - minMist ) / (maxMist - minMist);
 
-			return mix(col(p), getLucht(p), mist) * max(vec4(0.05), getLight(p, n));
+			return mix(col(p), getLucht(p), mist) * max(vec4(0.025), getLight(p, n));
 		}
 
 		p += curraydir * max(0.0, d);

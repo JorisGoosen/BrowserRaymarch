@@ -20,6 +20,8 @@ var canvas=null;
 		zoom += event.deltaY * 0.005;
 	  } 	
 	
+	var randomNumber = Math.random();
+
 	function init() {
 	
 		canvas = document.getElementById("kleurtjes");
@@ -136,7 +138,9 @@ var canvas=null;
 		
 		gl.useProgram(VOLSHADER);
 		
+		
 		gl.uniform1f(gl.getUniformLocation(VOLSHADER,"time"),			time);
+		gl.uniform1f(gl.getUniformLocation(VOLSHADER,"random"),			randomNumber);
 		gl.uniform1f(gl.getUniformLocation(VOLSHADER,"zoom"),			zoom);
 		gl.uniform1f(gl.getUniformLocation(VOLSHADER,"fov_y_scale"),	1.5);
 		gl.uniform1f(gl.getUniformLocation(VOLSHADER,"aspect"),			canvas.width/canvas.height);		

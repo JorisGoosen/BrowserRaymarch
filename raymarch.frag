@@ -191,12 +191,25 @@ uniform float zoom;
 
 const float eps 			= 0.001;  
 
-float sphere0(vec3 p)
-{
 	const float	sphereradius 	= 12.0;
 	const vec3 	spherePos 		= vec3(-4.0, 0.0, 0.0);
 
+	const vec3 sphereGat 		= spherePos + vec3(0.0, 0.0, sphereradius * 0.7 );
+	const float	gatRad		 	= 4.0;
+
+
+float sphere0(vec3 p)
+{
+
 	return length(p - spherePos) - sphereradius;
+
+	
+
+}
+
+float spherePupil(vec3 p)
+{
+	return length(p - sphereGat) - gatRad;
 }
 
 const float	zonRad 	= 1.0;
@@ -210,13 +223,16 @@ float sphereZon(vec3 p)
 
 float getDist(vec3 p)
 {
-	return min(sphereZon(p), sphere0(p));
+	return min(sphereZon(p), min(sphere0(p), spherePupil(p)));
 }
 
 int whoAmi(vec3 p)
 {
-	if(sphereZon(p) < sphere0(p))
+	float sph0 = sphere0(p), sphp = spherePupil(p);
+	if(sphereZon(p) < min(sph0, sphp))
 		return 0;
+	if(sph0 > sphp)
+		return 2;
 	return 1;
 }
 
@@ -322,9 +338,10 @@ vec4 march()
 
 			if(who == 0)
 				return zonCol;
-			
-			vec3 n = getNormalDistorted(p, 0.125);
-			return getLight(p, n, vec4(0.0, 0.0, 1.0, 1.0));
+			if(who == 2)
+				return getLight(p, getNormal(p, 0.125), vec4(0.0, 0.0, 0.0, 1.0));
+
+			return getLight(p, getNormalDistorted(p, 0.125), vec4(0.0, 0.0, 1.0, 1.0));
 		}
 
 		if(d > 0.0)

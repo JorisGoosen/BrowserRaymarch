@@ -111,7 +111,7 @@ var canvas=null;
 
 	function clicked()
 	{
-		fsswitch();
+	//	fsswitch();
 	}
 	
 	function renderFrame(time)

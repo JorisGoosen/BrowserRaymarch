@@ -191,57 +191,82 @@ varying vec3 maanPos;
 uniform float time;
 uniform float zoom;
 
-const float eps 			= 0.001;  
-
-	const float	sphereradius 	= 6.0;
-	const float	gatRad		 	= 6.1;
-	const vec3 	spherePos 		= vec3(0.0, 0.0, 0.0);
-
-
-	
+const float eps 			= 0.01;  
+const float	waterRadius 	= 6.0;
+const float	ijsRadius		= 6.3;
+const float grasRadius		= (ijsRadius - waterRadius) * 0.5 + waterRadius;
+const vec3 	wereldPos 		= vec3(0.0, 0.0, 0.0);
 
 
-float sphere0(vec3 p)
+float waterDist(vec3 p)
 {
-
-	return length(p - spherePos) - sphereradius;
-
-	
-
+	return length(p - wereldPos) - waterRadius;
 }
 
-float spherePupil(vec3 p)
+float ijsDist(vec3 p)
 {
-	float d = length(p - spherePos) - gatRad;
+	float d = length(p - wereldPos) - ijsRadius;
 
 	float hoek = atan(p.x, p.z);
 
-	d = max(d, min(p.y + gatRad * 0.65, -1.0 * p.y + gatRad * 0.65) - sin(hoek * 6.0) * gatRad * 0.05 );
+	d = max(
+		d, 
+		min(
+			 p.y + ijsRadius * 0.65, 
+			-p.y + ijsRadius * 0.65
+		) 
+		- (0.25 * sin(hoek * 66.0)) 
+		+ (1.00 * sin(hoek *  3.0)) 
+		+ (0.60 * sin(hoek * 24.0)) 
+		* ijsRadius
+		* 0.05 
+	);
 
 	return d;
 }
 
-const float	zonRad 	= 1.0;
+float grasDist(vec3 p)
+{
+	float d = length(p - wereldPos) - grasRadius ;
+	float hoek = atan(p.x, p.z);
 
+	return max(
+		d, 
+		min(
+			 p.y + grasRadius * 0.25, 
+			-p.y + grasRadius * 0.25
+		)
+		- (0.29 * sin(hoek * 20.222)) 
+		+ (0.80 * sin(hoek *  3.70)) 
+		+ (0.10 * sin(hoek * 51.2))
+		);
+}
+
+const float	zonRad 	= 1.0;
 const vec4	zonCol	= vec4(1.0, 1.0, 0.75, 1.0);
 
-float sphereZon(vec3 p)
+float zonDist(vec3 p)
 {
 	return length(p - zonPos) - zonRad;
 }
 
 float getDist(vec3 p)
 {
-	return min(sphereZon(p), min(sphere0(p), spherePupil(p)));
+	return min(min(zonDist(p), grasDist(p)), min(waterDist(p), ijsDist(p)));
 }
 
 int whoAmi(vec3 p)
 {
-	float sph0 = sphere0(p), sphp = spherePupil(p);
-	if(sphereZon(p) < min(sph0, sphp))
-		return 0;
-	if(sph0 > sphp)
-		return 2;
+	float 	watD 	= waterDist(p), 
+			ijsD 	= ijsDist(p), 
+			grasD 	= grasDist(p),
+			zonD	= zonDist(p),
+			minD	= min(min(watD, ijsD), min(grasD, zonD));
+
+		 if(zonD  == minD) return 0;
+	else if(ijsD  == minD) return 2;
+	else if(grasD == minD) return 3;	
+	//else if(watD  == minD) 
 	return 1;
 }
 
@@ -281,7 +306,16 @@ vec3 getNormalDistorted(vec3 p, float r)
 	return 	normalize(n + (o * 0.35)+ (o2 * 0.25));
 }
 
-vec3 getGrassNormal(vec3 p, float r)
+vec3 getGrasNormal(vec3 p, float r)
+{
+	vec3 	n 		= getNormal(p, r);
+	float 	hoeka 	= atan(p.x, p.z),
+			hoekb 	= atan(p.x, p.y);
+	vec3 	o 		= vec3(sin(hoeka) * sin(hoekb), cos(hoeka) * sin(hoekb), cos(hoekb)); 
+	return 	normalize(n + (o * 0.35));
+}
+
+vec3 getIjsNormal(vec3 p, float r)
 {
 	vec3 	n = getNormal(p, r);
 
@@ -325,7 +359,7 @@ vec4 getLightFromSun(vec3 p, vec3 n, vec4 c)
     {
 		tp	= p + (zn * t);
 		d   = getDist(tp);
-		zd  = sphereZon(tp);
+		zd  = zonDist(tp);
 		md  = min(zd, d);
 		
        // res = min( res, k*md/t );
@@ -369,10 +403,9 @@ vec4 march()
 		{
 			int who = whoAmi(p);
 
-			if(who == 0)
-				return zonCol;
-			if(who == 2)
-				return getLight(p, getGrassNormal(p, 0.125), vec4(0.8, 0.8, 1.0, 1.0));
+			if(who == 0)	return zonCol;
+			if(who == 2)	return getLight(p, getIjsNormal(p, 0.125), vec4(0.8, 0.8, 1.0, 1.0));
+			if(who == 3)	return getLight(p, getGrasNormal(p, 0.125), vec4(0.1, 0.4, 0.0, 1.0));
 
 			return getLight(p, getNormalDistorted(p, 0.125), vec4(0.0, 0.0, 1.0, 1.0));
 		}

@@ -185,17 +185,19 @@ float pnoise(vec3 P, vec3 rep)
 
 varying vec3 startpoint;
 varying vec3 curraydir;
+varying vec3 zonPos;
+varying vec3 maanPos;
 
 uniform float time;
 uniform float zoom;
 
 const float eps 			= 0.001;  
 
-	const float	sphereradius 	= 12.0;
-	const vec3 	spherePos 		= vec3(-4.0, 0.0, 0.0);
+	const float	sphereradius 	= 6.0;
+	const vec3 	spherePos 		= vec3(0.0, 0.0, 0.0);
 
-	const vec3 sphereGat 		= spherePos + vec3(0.0, 0.0, sphereradius * 0.7 );
-	const float	gatRad		 	= 4.0;
+
+	const float	gatRad		 	= 2.5;
 
 
 float sphere0(vec3 p)
@@ -209,12 +211,12 @@ float sphere0(vec3 p)
 
 float spherePupil(vec3 p)
 {
-	return length(p - sphereGat) - gatRad;
+	return length(p - maanPos) - gatRad;
 }
 
 const float	zonRad 	= 1.0;
-const vec3 	zonPos 	= vec3(0.0, 6.0, 30.0);
-const vec4	zonCol	= vec4(1.0, 1.0, 1.0, 1.0);
+
+const vec4	zonCol	= vec4(1.0, 1.0, 0.75, 1.0);
 
 float sphereZon(vec3 p)
 {
@@ -276,30 +278,39 @@ const int maxIt = 300;
 
 vec4 getLightFromSun(vec3 p, vec3 n, vec4 c)
 {
-	p += n * eps * 1.1;
+	p += n * eps * 1.5;
 
 	vec3 	zn		= normalize(zonPos - p);
-	float	refzn	= dot(zn, reflect(curraydir, n));
-	float 	dotzn 	= dot(zn, n);
+	float	refzn	= dot(zn, reflect(n, curraydir));
+	float 	dotzn 	= 1.0;//dot(zn, n);
 
-	if(refzn < 0.6)	refzn = 0.0;
-	else			refzn = pow(refzn, 4.0);
+	//if(refzn < 0.0)	refzn = 0.0;
+	//else			
+	refzn = pow(refzn, 16.0);
 	
 	//if(refzn > 0.5 && refzn > dotzn)
 	//	dotzn = refzn;
 
-	float t = 0.0, d = 0.0, zd = 0.0, md = 0.0;
+	float 	t = 0.0, 
+			d = 0.0, 
+			zd = 0.0, 
+			md = 0.0,
+			res = 1.0;
+	vec3 	tp;
+	const float k = 2.0;
 
 	for(int safetyCount = 0; safetyCount < maxIt; safetyCount++)
     {
-		d   = getDist(p);
-		zd  = sphereZon(p);
+		tp	= p + (zn * t);
+		d   = getDist(tp);
+		zd  = sphereZon(tp);
 		md  = min(zd, d);
-		t  += abs(md);
-        p  += zn * md;
 		
-		if(zd <= zonRad)
-			return max(dotzn * c, vec4(refzn)) * zonCol; // zonCol
+       // res = min( res, k*md/t );
+		t  += max(0.0, md);
+		
+		if(zd <= eps)
+			return max(dotzn * c, vec4(refzn)) * zonCol * res; // zonCol
 
 		if(d <= eps && t > eps * 2.0)
 			return vec4(0.0);
@@ -311,7 +322,7 @@ vec4 getLightFromSun(vec3 p, vec3 n, vec4 c)
 
 vec4 getLight(vec3 p, vec3 n, vec4 c)
 {
-	return max(0.666 * c, getLightFromSun(p, n, c));
+	return max(0.111 * c, getLightFromSun(p, n, c));
 }
 
 vec4 getLucht()
@@ -339,15 +350,15 @@ vec4 march()
 			if(who == 0)
 				return zonCol;
 			if(who == 2)
-				return getLight(p, getNormal(p, 0.125), vec4(0.0, 0.0, 0.0, 1.0));
+				return getLight(p, getNormal(p, 0.125), vec4(0.5, 0.5, 0.5, 1.0));
 
 			return getLight(p, getNormalDistorted(p, 0.125), vec4(0.0, 0.0, 1.0, 1.0));
 		}
 
 		if(d > 0.0)
 		{
-			p += curraydir * d;
 			t += d;
+			p = startpoint + (curraydir * t);
 		}
 
 		if(t > 600.0)

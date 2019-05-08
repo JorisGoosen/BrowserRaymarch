@@ -194,10 +194,11 @@ uniform float zoom;
 const float eps 			= 0.001;  
 
 	const float	sphereradius 	= 6.0;
+	const float	gatRad		 	= 6.1;
 	const vec3 	spherePos 		= vec3(0.0, 0.0, 0.0);
 
 
-	const float	gatRad		 	= 2.5;
+	
 
 
 float sphere0(vec3 p)
@@ -211,7 +212,13 @@ float sphere0(vec3 p)
 
 float spherePupil(vec3 p)
 {
-	return length(p - maanPos) - gatRad;
+	float d = length(p - spherePos) - gatRad;
+
+	float hoek = atan(p.x, p.z);
+
+	d = max(d, min(p.y + gatRad * 0.65, -1.0 * p.y + gatRad * 0.65) - sin(hoek * 6.0) * gatRad * 0.05 );
+
+	return d;
 }
 
 const float	zonRad 	= 1.0;
@@ -274,6 +281,20 @@ vec3 getNormalDistorted(vec3 p, float r)
 	return 	normalize(n + (o * 0.35)+ (o2 * 0.25));
 }
 
+vec3 getGrassNormal(vec3 p, float r)
+{
+	vec3 	n = getNormal(p, r);
+
+	float mult = 12.0 * zoom;
+
+	float 	a = cnoise(p * mult);
+	
+	
+	vec3	o = vec3(sin(a * 15.0), sin(a * 33.0), sin(a * 45.0)); 
+
+	return 	normalize(n + (o * 0.15));
+}
+
 const int maxIt = 300;
 
 vec4 getLightFromSun(vec3 p, vec3 n, vec4 c)
@@ -281,12 +302,13 @@ vec4 getLightFromSun(vec3 p, vec3 n, vec4 c)
 	p += n * eps * 1.5;
 
 	vec3 	zn		= normalize(zonPos - p);
-	float	refzn	= dot(zn, reflect(n, curraydir));
-	float 	dotzn 	= 1.0;//dot(zn, n);
-
+	float	refzn	= dot(zn, reflect(curraydir, n));
+	float 	dotzn 	= dot(zn, n);
+	float	cn		= dot(curraydir, n);
+	vec4 	deflt	= abs(cn) * c;
 	//if(refzn < 0.0)	refzn = 0.0;
 	//else			
-	refzn = pow(refzn, 16.0);
+	refzn = pow(max(0.0, refzn), 9.5);
 	
 	//if(refzn > 0.5 && refzn > dotzn)
 	//	dotzn = refzn;
@@ -310,19 +332,19 @@ vec4 getLightFromSun(vec3 p, vec3 n, vec4 c)
 		t  += max(0.0, md);
 		
 		if(zd <= eps)
-			return max(dotzn * c, vec4(refzn)) * zonCol * res; // zonCol
+			return max(deflt, max(dotzn * c, vec4(refzn)) * zonCol * res); // zonCol
 
 		if(d <= eps && t > eps * 2.0)
-			return vec4(0.0);
+			return deflt;
 	}
 
-	return vec4(0.0);
+	return deflt;
 }
 
 
 vec4 getLight(vec3 p, vec3 n, vec4 c)
 {
-	return max(0.111 * c, getLightFromSun(p, n, c));
+	return getLightFromSun(p, n, c);
 }
 
 vec4 getLucht()
@@ -350,7 +372,7 @@ vec4 march()
 			if(who == 0)
 				return zonCol;
 			if(who == 2)
-				return getLight(p, getNormal(p, 0.125), vec4(0.5, 0.5, 0.5, 1.0));
+				return getLight(p, getGrassNormal(p, 0.125), vec4(0.8, 0.8, 1.0, 1.0));
 
 			return getLight(p, getNormalDistorted(p, 0.125), vec4(0.0, 0.0, 1.0, 1.0));
 		}

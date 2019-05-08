@@ -39,18 +39,18 @@ mat4 rotationMatrix(vec3 axis, float angle)
 
 void main(void)
 { 
-	mat3 rotas = mat3(rotationMatrix(normalize(vec3(0.0, 0.0, 1.0)), ((random * 10.0) + (time * 0.000031236) * -1.0))); 
-	mat3 rot = mat3(rotationMatrix(rotas * vec3(0.0, 1.0, 0.0), ((random * 303.0) + (time * 0.0000966)) * -1.0));
+	mat3 rotas = mat3(rotationMatrix(vec3(0.0, 1.0, 0.0), 2.0 *  ((random * 10.0) + (time * 0.00011236) * -1.55))); 
+	mat3 rot = mat3(rotationMatrix(rotas * vec3(0.0, 0.0, 1.0), sin((random * 303.0) + (time * 0.0000966)) * -3.14));
 
     startpoint=	-rot * vec3( 0.0, 0.0, -16.0 * zoom);
 	curraydir = rot * normalize(vec3(uv.x * fov_y_scale * aspect, uv.y * fov_y_scale, -1.0));
 
-	rotas 	= mat3(rotationMatrix(normalize(vec3(0.0, 0.0, 1.0)), 	((random * 12.0) + (time * 0.000391236) * -1.0))); 
+	rotas 	= mat3(rotationMatrix(vec3(0.0, 0.0, 1.0), 	((random * 12.0) + (time * 0.000391236) * -1.0))); 
 	rot 	= mat3(rotationMatrix(rotas * 	vec3(0.0, 1.0, 0.0), 	((random * 33.0) + (time * 0.00072266)) * 1.0));
 
 	zonPos 	= rot * vec3(0.0, 0.0, 15.0);
 
-	rotas 	= mat3(rotationMatrix(normalize(vec3(0.0, 0.0, 1.0)), 	((random * 18.0) + (time * 0.000391236) * 1.0))); 
+	rotas 	= mat3(rotationMatrix(vec3(0.0, 0.0, 1.0), 	((random * 18.0) + (time * 0.000391236) * 1.0))); 
 	rot 	= mat3(rotationMatrix(rotas * 	vec3(0.0, 1.0, 0.0), 	((random * 11.0) + (time * 0.0002172266)) * 1.0));
 	
 	maanPos	= rot * vec3(0.0, 2.0, 10.0);

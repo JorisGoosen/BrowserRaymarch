@@ -309,7 +309,7 @@ vec3 getNormalDistorted(vec3 p, float r)
 vec3 getGrasNormal(vec3 p, float r)
 {
 	vec3 	n 		= getNormal(p, r);
-	float 	hoeka 	= atan(p.x, p.z),
+	float 	hoeka 	= atan(p.x, p.z) * cnoise(time + (p * 10000.0)),
 			hoekb 	= atan(p.x, p.y);
 	vec3 	o 		= vec3(sin(hoeka) * sin(hoekb), cos(hoeka) * sin(hoekb), cos(hoekb)); 
 	return 	normalize(n + (o * 0.35));
@@ -402,12 +402,12 @@ vec4 march()
 		if(d <= eps)
 		{
 			int who = whoAmi(p);
+			float mult = 1.0;// (float(safetyCount) / 10.0);
+			if(who == 0)	return zonCol * mult;
+			if(who == 2)	return getLight(p, getIjsNormal(p, 0.125), vec4(0.8, 0.8, 1.0, 1.0)) * mult;
+			if(who == 3)	return getLight(p, getGrasNormal(p, 0.125), vec4(0.1, 0.4, 0.0, 1.0)) * mult;
 
-			if(who == 0)	return zonCol;
-			if(who == 2)	return getLight(p, getIjsNormal(p, 0.125), vec4(0.8, 0.8, 1.0, 1.0));
-			if(who == 3)	return getLight(p, getGrasNormal(p, 0.125), vec4(0.1, 0.4, 0.0, 1.0));
-
-			return getLight(p, getNormalDistorted(p, 0.125), vec4(0.0, 0.0, 1.0, 1.0));
+			return getLight(p, getNormalDistorted(p, 0.125), vec4(0.0, 0.0, 1.0, 1.0))  * mult;
 		}
 
 		if(d > 0.0)
